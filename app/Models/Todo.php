@@ -8,15 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 class Todo extends Model
 {
     use HasFactory;
-
     protected $fillable = [
+
         'title',
         'user_id',
+        'category_id',
         'is_done',
+        
+
     ];
-    
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::Class);
     }
-}
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+};
