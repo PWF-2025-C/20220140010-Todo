@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    
     /**
      * Login user dengan email dan password.
      */
@@ -38,7 +37,7 @@ class AuthController extends Controller
             $user = Auth::guard('api')->user();
             return response()->json([
                 'status_code' => 200,
-                'message' => 'Login berhasil',
+                'message' => 'Login Berhasil',
                 'data' => [
                     'user' => [
                         'id' => $user->id,
@@ -47,9 +46,10 @@ class AuthController extends Controller
                         'is_admin' => $user->is_admin,
                     ],
                     'token' => $token,
-                ]
+                ],
             ], 200);
-        } catch (Exception $e) {
+
+        } catch (\Exception $e) {
             return response()->json([
                 'status_code' => 500,
                 'message' => 'Terjadi kesalahan',
@@ -60,11 +60,51 @@ class AuthController extends Controller
     /**
      * Logout user yang sedang login.
      */
-    public function logout()
+
+
+    #[Response(
+        status: 200,
+        content: [
+            'status_code' => 200,
+            'message' => 'Logout berhasil. Token telah dihapus.'
+        ]
+    )]
+
+    #[Response(
+        status: 500,
+        content: [
+            'status_code' => 500,
+            'message' => 'Gagal logout, terjadi kesalahan.'
+        ]
+    )]
+
+    // public function logout()
+    // {
+    //     Auth::guard('api')->logout();
+    //     return response()->json([
+    //         'message' => 'Logout Berhasil',
+    //     ], 200);
+    // }
+    /**
+     * Logout user yang sedang login.
+     */
+    public function logout(Request $request) // Tambahkan Request $request
     {
-        Auth::guard('api')->logout();
-        return response()->json([
-            'message' => 'Logout berhasil',
-        ], 200);
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken()); // Ubah logika logout
+
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Logout berhasil. Token telah dihapus.',
+            ], 200);
+
+        } catch (\Exception $e) { // Tangkap Exception
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Gagal logout, terjadi kesalahan.',
+            ], 500);
+        }
     }
+
+
 }
